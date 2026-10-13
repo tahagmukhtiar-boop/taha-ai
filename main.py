@@ -1,50 +1,52 @@
 from kivy.app import App
 from kivy.uix.boxlayout import BoxLayout
+from kivy.uix.textinput import TextInput
+from kivy.uix.button import Button
 from kivy.uix.label import Label
-from kivy.animation import Animation
-from kivy.graphics import Color, Ellipse, Rectangle
-
-class GlowingUI(BoxLayout):
-    def __init__(self, **kwargs):
-        super(GlowingUI, self).__init__(**kwargs)
-        self.orientation = 'vertical'
-        self.padding = 50
-        self.spacing = 20
-
-        # Background color (Dark modern theme)
-        with self.canvas.before:
-            Color(0.05, 0.05, 0.1, 1)
-            self.rect = Rectangle(size=self.size, pos=self.pos)
-        self.bind(size=self._update_rect, pos=self._update_rect)
-
-        # Title Label
-        self.title_label = Label(text="Taha AI Active", font_size=28, color=(1, 1, 1, 1))
-        self.add_widget(self.title_label)
-
-        # Glowing Circle Layout
-        self.glow_layout = BoxLayout(size_hint=(None, None), size=(200, 200), pos_hint={'center_x': 0.5})
-        with self.glow_layout.canvas.before:
-            self.glow_color = Color(0, 0.8, 1, 0.6)
-            self.circle = Ellipse(size=(150, 150), pos=(25, 25))
-        self.add_widget(self.glow_layout)
-
-        # Start Glowing Animation
-        self.start_glow_animation()
-
-    def _update_rect(self, instance, value):
-        self.rect.size = instance.size
-        self.rect.pos = instance.pos
-
-    def start_glow_animation(self):
-        anim = Animation(size=(190, 190), duration=1) + Animation(size=(150, 150), duration=1)
-        anim += Animation(size=(190, 190), duration=1) + Animation(size=(150, 150), duration=1)
-        anim.repeat = True
-        anim.start(self.circle)
+from kivy.uix.scrollview import ScrollView
 
 class TahaAIApp(App):
     def build(self):
-        return GlowingUI()
+        root = BoxLayout(orientation='vertical', padding=10, spacing=10)
+        
+        # Chat history display
+        self.chat_history = Label(text="Taha AI Initialized...\n", size_hint_y=None, halign='left', valign='top')
+        self.chat_history.bind(texture_size=self.chat_history.setter('texture_size'))
+        
+        scroll = ScrollView(size_hint=(1, 0.8))
+        scroll.add_widget(self.chat_history)
+        root.add_widget(scroll)
+        
+        # Input layout
+        input_layout = BoxLayout(size_hint=(1, 0.1), spacing=10)
+        self.user_input = TextInput(hint_text="Yahan message likhein...", multiline=False)
+        send_btn = Button(text="Send", size_hint_x=0.3)
+        send_btn.bind(on_press=self.process_message)
+        
+        input_layout.add_widget(self.user_input)
+        input_layout.add_widget(send_btn)
+        root.add_widget(input_layout)
+        
+        return root
+
+    def process_message(self, instance):
+        text = self.user_input.text.strip()
+        if not text:
+            return
+        
+        self.chat_history.text += f"\nUser: {text}\n"
+        
+        # Simple AI response & command logic
+        if "hello" in text.lower():
+            response = "Taha AI: Hello! Main aapki kya madad kar sakta hoon?"
+        elif "open" in text.lower():
+            response = f"Taha AI: '{text}' command receive ho gayi hai."
+        else:
+            response = f"Taha AI: Aapne kaha '{text}'."
+            
+        self.chat_history.text += f"{response}\n"
+        self.user_input.text = ""
 
 if __name__ == '__main__':
     TahaAIApp().run()
-      
+        
