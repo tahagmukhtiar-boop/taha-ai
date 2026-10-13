@@ -9,6 +9,9 @@ package.name = tahaai
 # (str) Package domain (needed for android packaging)
 package.domain = org.taha
 
+# (str) Source code where the main.py lives
+source.dir = .
+
 # (str) Source files to include (let it empty to include all files)
 source.include_exts = py,png,jpg,kv,atlas
 
